@@ -1,17 +1,16 @@
 package com.vijayarunkumar.anupama.barcodevisionapiexample;
 
 import android.app.Activity;
-import android.content.Context;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.Log;
-import android.util.SparseArray;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
+import com.google.android.gms.vision.MultiProcessor;
 import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
@@ -41,10 +40,11 @@ public class BarcodeScannerActivity extends Activity implements SurfaceHolder.Ca
         ButterKnife.bind(this);
 
         mBarcodeDetector = new BarcodeDetector.Builder(this)
-                .setBarcodeFormats(Barcode.ITF | Barcode.PDF417| Barcode.QR_CODE)
                 .build();
-        mBarcodeDetector.setProcessor(new BarcodeFocusingprocessor(mBarcodeDetector,new BarcodeTracker()));
-//                new MultiProcessor.Builder(new BarcodeTracker()).build());
+        BarcodeFocusingprocessor barcodeFactory = new BarcodeFocusingprocessor();
+        mBarcodeDetector.setProcessor(
+                new MultiProcessor.Builder<>(barcodeFactory).build());
+
 
         mCameraSource = new CameraSource.Builder(this, mBarcodeDetector)
                 .setFacing(CameraSource.CAMERA_FACING_BACK)
@@ -53,14 +53,6 @@ public class BarcodeScannerActivity extends Activity implements SurfaceHolder.Ca
 
         mSurfaceHolder = mSurfaceView.getHolder();
         mSurfaceHolder.addCallback(this);
-    }
-
-    private void startCameraSource() {
-        try {
-            mCameraSource.start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -85,25 +77,16 @@ public class BarcodeScannerActivity extends Activity implements SurfaceHolder.Ca
 
 
 
-private class BarcodeFocusingprocessor implements Detector.Processor<Barcode> {
-    public BarcodeFocusingprocessor(BarcodeDetector barcodeDetector, BarcodeTracker barcodeTracker) {
-        Log.d(">>>","BarcodeDetector is :" +barcodeDetector);
-
-    }
+private class BarcodeFocusingprocessor implements MultiProcessor.Factory<Barcode> {
 
     @Override
-    public void release() {
-
-    }
-
-    @Override
-    public void receiveDetections(Detector.Detections<Barcode> detections) {
-        SparseArray<Barcode> detectedItems = detections.getDetectedItems();
-        Log.d(">>>","items are " +detectedItems);
+    public Tracker<Barcode> create(Barcode barcode) {
+        return new BarcodeTracker();
     }
 }
 
 private class BarcodeTracker extends Tracker<Barcode>{
+
     @Override
     public void onNewItem(int id, Barcode item) {
         Log.d(">>>", "items are !!!!" + item);
@@ -111,12 +94,10 @@ private class BarcodeTracker extends Tracker<Barcode>{
 
     @Override
     public void onUpdate(Detector.Detections<Barcode> detections, Barcode item) {
-        Log.d(">>>","barcode is :" +item);
+        Log.d(">>>","barcode is :" +item.rawValue);
 
     }
 }
-
-
 
     @Override
     protected void onResume() {
@@ -167,5 +148,4 @@ private class BarcodeTracker extends Tracker<Barcode>{
 
         return false;
     }
-
 }
