@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.hardware.Camera;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.SurfaceHolder;
@@ -16,6 +17,7 @@ import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -67,6 +69,7 @@ public class BarcodeScannerActivity extends Activity implements SurfaceHolder.Ca
             mCameraSource.start(holder);
             Boolean isWorking = mBarcodeDetector.isOperational();
             Log.d(">>>", "is barode detector working : " + isWorking);
+            cameraFocus(mCameraSource,Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -130,6 +133,39 @@ private class BarcodeTracker extends Tracker<Barcode>{
     protected void onDestroy() {
         super.onDestroy();
         mCameraSource.release();
+    }
+
+
+    public static boolean cameraFocus(@NonNull CameraSource cameraSource, @NonNull String focusMode) {
+        Field[] declaredFields = CameraSource.class.getDeclaredFields();
+
+        for (Field field : declaredFields) {
+            if (field.getType() == Camera.class) {
+                field.setAccessible(true);
+                try {
+                    Camera camera = (Camera) field.get(cameraSource);
+                    if (camera != null) {
+                        Camera.Parameters params = camera.getParameters();
+
+                        if (!params.getSupportedFocusModes().contains(focusMode)) {
+                            return false;
+                        }
+
+                        params.setFocusMode(focusMode);
+                        camera.setParameters(params);
+                        return true;
+                    }
+
+                    return false;
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+
+                break;
+            }
+        }
+
+        return false;
     }
 
 }
