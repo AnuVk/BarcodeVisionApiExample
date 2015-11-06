@@ -42,6 +42,12 @@ public class BarcodeMainActivity extends AppCompatActivity {
                     if (permissionCheck == PackageManager.PERMISSION_DENIED) {
                         requestPermissions(new String[]{Manifest.permission.CAMERA}, 123);
                     }
+                    else if (permissionCheck == PackageManager.PERMISSION_GRANTED){
+                        launchCameraForScanning();
+                    }
+                }
+                else {
+                    launchCameraForScanning();
                 }
             }
         });
@@ -56,9 +62,7 @@ public class BarcodeMainActivity extends AppCompatActivity {
                     Snackbar.make(mLayout, "Camera permission request was granted.",
                             Snackbar.LENGTH_SHORT)
                             .show();
-                    Intent intent = new Intent(mContext, BarcodeScannerActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    mContext.startActivity(intent);
+                    launchCameraForScanning();
                 } else {
                     // Permission Denied
                     Snackbar.make(mLayout, "Camera permission request was denied.",
@@ -69,6 +73,12 @@ public class BarcodeMainActivity extends AppCompatActivity {
             default:
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
+    }
+
+    private void launchCameraForScanning() {
+        Intent intent = new Intent(mContext, BarcodeScannerActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        mContext.startActivity(intent);
     }
 
     @Override

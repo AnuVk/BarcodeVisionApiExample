@@ -1,16 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent">
 
-    <!--<com.vijayarunkumar.anupama.barcodevisionapiexample.CameraSourcePreview-->
-        <!--android:id="@+id/camera_preview"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent"/>-->
-<SurfaceView
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:id="@+id/surface_view"/>
+<!--<SurfaceView-->
+    <!--android:layout_width="fill_parent"-->
+    <!--android:layout_height="fill_parent"-->
+    <!--android:id="@+id/surface_view"/>-->
 
-</LinearLayout>
+    <com.vijayarunkumar.anupama.barcodevisionapiexample.CustomCameraPreview
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:id="@+id/camera_preview"/>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="@drawable/rectangle_margin"
+        android:alpha="0.5">
+
+    </LinearLayout>
+
+</RelativeLayout>

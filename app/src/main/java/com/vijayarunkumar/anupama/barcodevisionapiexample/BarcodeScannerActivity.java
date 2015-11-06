@@ -28,12 +28,17 @@ import butterknife.ButterKnife;
 /**
  * Created by Anu on 19/08/15.
  */
-public class BarcodeScannerActivity extends Activity implements SurfaceHolder.Callback{
-    @Bind(R.id.surface_view)SurfaceView mSurfaceView;
+//public class BarcodeScannerActivity extends Activity implements SurfaceHolder.Callback{
+public class BarcodeScannerActivity extends Activity{
+
+        //    @Bind(R.id.surface_view)SurfaceView mSurfaceView;
+    @Bind(R.id.camera_preview) CustomCameraPreview mCustomeCameraPreview;
 
     private CameraSource mCameraSource;
-    private SurfaceHolder mSurfaceHolder;
+//    private SurfaceHolder mSurfaceHolder;
     private BarcodeDetector mBarcodeDetector;
+//    private CustomCameraPreview mCustomCameraPreview;
+    private Camera mCamera;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -54,29 +59,53 @@ public class BarcodeScannerActivity extends Activity implements SurfaceHolder.Ca
                 .setRequestedPreviewSize(1600, 1024)
                 .build();
 
-        mSurfaceHolder = mSurfaceView.getHolder();
-        mSurfaceHolder.addCallback(this);
-    }
-
-    @Override
-    public void surfaceCreated(SurfaceHolder holder) {
-        try {
-            mCameraSource.start(holder);
-            Boolean isWorking = mBarcodeDetector.isOperational();
-            Log.d(">>>", "is barode detector working : " + isWorking);
-            cameraFocus(mCameraSource,Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
-        } catch (IOException e) {
-            e.printStackTrace();
+        mCamera = getCameraInstance();
+        if (cameraAvailable(mCamera)){
+            mCustomeCameraPreview.init(mCameraSource,mBarcodeDetector);
         }
+        else {
+            finish();
+        }
+
+//        mSurfaceHolder = mSurfaceView.getHolder();
+//        mSurfaceHolder.addCallback(this);
     }
 
-    @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+
+    public static Camera getCameraInstance() {
+        Camera c = null;
+        try {
+            c = Camera.open();
+        } catch (Exception e) {
+            // Camera is not available or doesn't exist
+            Log.d("getCamera failed", e.getMessage());
+        }
+        return c;
     }
 
-    @Override
-    public void surfaceDestroyed(SurfaceHolder holder) {
+    public static boolean cameraAvailable(Camera camera) {
+        return camera != null;
     }
+
+//    @Override
+//    public void surfaceCreated(SurfaceHolder holder) {
+//        try {
+//            mCameraSource.start(holder);
+//            Boolean isWorking = mBarcodeDetector.isOperational();
+//            Log.d(">>>", "is barode detector working : " + isWorking);
+//            cameraFocus(mCameraSource,Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
+//
+//    @Override
+//    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+//    }
+//
+//    @Override
+//    public void surfaceDestroyed(SurfaceHolder holder) {
+//    }
 
 
 
@@ -102,53 +131,66 @@ private class BarcodeTracker extends Tracker<Barcode>{
     }
 }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
+
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//    }
 
     @Override
     protected void onPause() {
         super.onPause();
-        mCameraSource.release();
+       releaseCamera();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mCameraSource.release();
+        releaseCamera();
     }
 
+//    @Override
+//    public void onBackPressed() {
+//        super.onBackPressed();
+//        releaseCamera();
+//    }
 
-    public static boolean cameraFocus(@NonNull CameraSource cameraSource, @NonNull String focusMode) {
-        Field[] declaredFields = CameraSource.class.getDeclaredFields();
-
-        for (Field field : declaredFields) {
-            if (field.getType() == Camera.class) {
-                field.setAccessible(true);
-                try {
-                    Camera camera = (Camera) field.get(cameraSource);
-                    if (camera != null) {
-                        Camera.Parameters params = camera.getParameters();
-
-                        if (!params.getSupportedFocusModes().contains(focusMode)) {
-                            return false;
-                        }
-
-                        params.setFocusMode(focusMode);
-                        camera.setParameters(params);
-                        return true;
-                    }
-
-                    return false;
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-
-                break;
-            }
+    private void releaseCamera() {
+        if(mCamera != null){
+            mCamera.release();
+            mCamera = null;
         }
-
-        return false;
     }
+
+//    public static boolean cameraFocus(@NonNull CameraSource cameraSource, @NonNull String focusMode) {
+//        Field[] declaredFields = CameraSource.class.getDeclaredFields();
+//
+//        for (Field field : declaredFields) {
+//            if (field.getType() == Camera.class) {
+//                field.setAccessible(true);
+//                try {
+//                    Camera camera = (Camera) field.get(cameraSource);
+//                    if (camera != null) {
+//                        Camera.Parameters params = camera.getParameters();
+//
+//                        if (!params.getSupportedFocusModes().contains(focusMode)) {
+//                            return false;
+//                        }
+//
+//                        params.setFocusMode(focusMode);
+//                        camera.setParameters(params);
+//                        return true;
+//                    }
+//
+//                    return false;
+//                } catch (IllegalAccessException e) {
+//                    e.printStackTrace();
+//                }
+//
+//                break;
+//            }
+//        }
+//
+//        return false;
+//    }
 }
