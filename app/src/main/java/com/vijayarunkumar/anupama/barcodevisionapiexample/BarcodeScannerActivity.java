@@ -1,9 +1,13 @@
 package com.vijayarunkumar.anupama.barcodevisionapiexample;
 
+import android.Manifest;
 import android.app.Activity;
+import android.content.pm.PackageManager;
 import android.hardware.Camera;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -34,7 +38,6 @@ public class BarcodeScannerActivity extends Activity implements SurfaceHolder.Ca
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.camera_main);
 
         ButterKnife.bind(this);
