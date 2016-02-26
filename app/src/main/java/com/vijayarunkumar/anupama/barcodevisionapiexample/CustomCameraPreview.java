@@ -72,11 +72,15 @@ public class CustomCameraPreview extends SurfaceView implements SurfaceHolder.Ca
         try {
             mCameraSource.start(holder);
             Boolean isWorking = mBarcodeDetector.isOperational();
-            Log.d(">>>", "is barode detector working : " + isWorking);
-            cameraFocus(mCameraSource,Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+            Log.d(">>>", "is bacrode detector working : " + isWorking);
         } catch (IOException e) {
             e.printStackTrace();
-        }    }
+            Log.e(">>>","io exception in surfaceCreated");
+        } catch (SecurityException s){
+            s.printStackTrace();
+            Log.e(">>>","Security exception in surfaceCreated");
+        }
+    }
 
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
@@ -84,36 +88,5 @@ public class CustomCameraPreview extends SurfaceView implements SurfaceHolder.Ca
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-    }
-
-    public static boolean cameraFocus(@NonNull CameraSource cameraSource, @NonNull String focusMode) {
-        Field[] declaredFields = CameraSource.class.getDeclaredFields();
-
-        for (Field field : declaredFields) {
-            if (field.getType() == Camera.class) {
-                field.setAccessible(true);
-                try {
-                    Camera camera = (Camera) field.get(cameraSource);
-                    if (camera != null) {
-                        Camera.Parameters params = camera.getParameters();
-
-                        if (!params.getSupportedFocusModes().contains(focusMode)) {
-                            return false;
-                        }
-
-                        params.setFocusMode(focusMode);
-                        camera.setParameters(params);
-                        return true;
-                    }
-
-                    return false;
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-
-                break;
-            }
-        }
-        return false;
     }
 }
