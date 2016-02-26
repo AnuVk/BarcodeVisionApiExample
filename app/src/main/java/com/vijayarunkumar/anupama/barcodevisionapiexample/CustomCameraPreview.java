@@ -1,8 +1,10 @@
 package com.vijayarunkumar.anupama.barcodevisionapiexample;
 
+import android.Manifest;
 import android.content.Context;
 import android.hardware.Camera;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresPermission;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -19,7 +21,6 @@ import java.lang.reflect.Field;
  */
 public class CustomCameraPreview extends SurfaceView implements SurfaceHolder.Callback {
 
-    private Camera mCamera;
     private SurfaceHolder mSurfaceHolder;
 
     public CameraSource getCameraSource() {
@@ -40,19 +41,30 @@ public class CustomCameraPreview extends SurfaceView implements SurfaceHolder.Ca
     public CustomCameraPreview(Context context) {
         super(context);
     }
-//    public void init(Camera camera, CameraSource cameraSource, BarcodeDetector barcodeDetector) {
-    public void init(CameraSource cameraSource, BarcodeDetector barcodeDetector) {
-//        this.mCamera = camera;
-        this.mBarcodeDetector = barcodeDetector;
-        this.mCameraSource = cameraSource;
-        initSurfaceHolder();
-    }
 
     @SuppressWarnings("deprecation") // needed for < 3.0
     private void initSurfaceHolder() {
         mSurfaceHolder = getHolder();
         mSurfaceHolder.addCallback(this);
         mSurfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+    }
+
+    public void start(CameraSource cameraSource, BarcodeDetector barcodeDetector) throws IOException, SecurityException{
+        mBarcodeDetector = barcodeDetector;
+        if (cameraSource == null){
+            stop();
+        }
+        mCameraSource = cameraSource;
+
+        if (mCameraSource != null){
+            initSurfaceHolder();
+        }
+    }
+
+    public void stop() {
+        if (mCameraSource != null){
+            mCameraSource.stop();
+        }
     }
 
     @Override
@@ -66,32 +78,12 @@ public class CustomCameraPreview extends SurfaceView implements SurfaceHolder.Ca
             e.printStackTrace();
         }    }
 
-//    private void initCamera(CameraSource cameraSource, BarcodeDetector barcodeDetector) {
-//        try {
-//            mCamera.setPreviewDisplay(mSurfaceHolder);
-//            mCamera.startPreview();
-//        } catch (Exception e) {
-//            Log.d("Error setting mCamera preview", e);
-//        }
-//        try {
-//            cameraSource.start(mSurfaceHolder);
-//            Boolean isWorking = barcodeDetector.isOperational();
-//            Log.d(">>>", "is barode detector working : " + isWorking);
-//            cameraFocus(cameraSource,Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
-
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
     }
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-        if (mCamera != null){
-            mCamera.stopPreview();
-        }
     }
 
     public static boolean cameraFocus(@NonNull CameraSource cameraSource, @NonNull String focusMode) {
@@ -122,8 +114,6 @@ public class CustomCameraPreview extends SurfaceView implements SurfaceHolder.Ca
                 break;
             }
         }
-
         return false;
     }
-
 }

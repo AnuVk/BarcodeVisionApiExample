@@ -10,9 +10,14 @@
     <!--android:id="@+id/surface_view"/>-->
 
     <com.vijayarunkumar.anupama.barcodevisionapiexample.CustomCameraPreview
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:id="@+id/camera_preview"/>
+
+    <!--<com.vijayarunkumar.anupama.barcodevisionapiexample.CustomGraphicOverlay-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:id="@+id/graphic_overlay"/>-->
 
     <LinearLayout
         android:layout_width="fill_parent"
