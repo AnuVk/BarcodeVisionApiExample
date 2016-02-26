@@ -52,11 +52,13 @@ public class BarcodeScannerActivity extends AppCompatActivity{
             }
         }
 
-        mCameraSource = new CameraSource.Builder(this, mBarcodeDetector)
+        CameraSource.Builder builder = new CameraSource.Builder(this, mBarcodeDetector)
                 .setFacing(CameraSource.CAMERA_FACING_BACK)
                 .setRequestedPreviewSize(1600, 1024)
-                .setRequestedFps(15.0f).build();
+                .setRequestedFps(15.0f);
+        builder.setAutoFocusEnabled(true);
 
+        mCameraSource = builder.build();
         try {
             mCustomCameraPreview.start(mCameraSource, mBarcodeDetector);
         } catch (IOException e) {
