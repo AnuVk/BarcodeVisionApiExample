@@ -89,6 +89,9 @@ public class CustomCameraPreview extends SurfaceView implements SurfaceHolder.Ca
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
+        if (mCamera != null){
+            mCamera.stopPreview();
+        }
     }
 
     public static boolean cameraFocus(@NonNull CameraSource cameraSource, @NonNull String focusMode) {
