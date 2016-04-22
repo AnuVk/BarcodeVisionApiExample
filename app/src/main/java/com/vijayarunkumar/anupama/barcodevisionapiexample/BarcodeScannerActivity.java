@@ -40,7 +40,7 @@ public class BarcodeScannerActivity extends AppCompatActivity{
         mBarcodeDetector.setProcessor(
                 new MultiProcessor.Builder<>(barcodeTrackerFactory).build());
 
-        if (mBarcodeDetector.isOperational()){
+        if (!mBarcodeDetector.isOperational()){
             Log.w(TAG, "Detector dependencies are not yet available.");
 
             IntentFilter lowstorageFilter = new IntentFilter(Intent.ACTION_DEVICE_STORAGE_LOW);
